@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const user_controller_1 = require("../controllers/user.controller");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const role_middleware_1 = require("../middlewares/role.middleware");
+const role_enum_1 = require("../enums/role.enum");
+const async_handler_1 = require("../utils/async-handler");
+const router = (0, express_1.Router)();
+const controller = new user_controller_1.UserController();
+router.use(auth_middleware_1.AuthMiddleware.protect, (0, role_middleware_1.requireRole)(role_enum_1.Role.ADMIN));
+router.get("/", (0, async_handler_1.asyncHandler)(controller.getAll));
+router.get("/:id", (0, async_handler_1.asyncHandler)(controller.getById));
+router.post("/", (0, async_handler_1.asyncHandler)(controller.create));
+router.put("/:id", (0, async_handler_1.asyncHandler)(controller.update));
+router.delete("/:id", (0, async_handler_1.asyncHandler)(controller.delete));
+exports.default = router;
