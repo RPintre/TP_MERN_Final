@@ -7,6 +7,7 @@ import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
+import { OrdersPage } from './pages/OrdersPage';
 
 function App() {
   return (
@@ -48,6 +49,14 @@ function App() {
           }
         />
 
+        <Route
+          path="/commandes"
+          element={
+            <ProtectedRoute>
+              <OrdersPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<HomePage />} />
         <Route path="*" element={<Navigate to="/catalogue" replace />} />
       </Routes>

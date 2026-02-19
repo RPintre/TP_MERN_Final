@@ -82,4 +82,8 @@ export class CartService extends ApiService {
   async getMyOrders(): Promise<Order[]> {
     return this.get<Order[]>('/mine');
   }
+
+  async getAllOrders(): Promise<Order[]> {
+    return this.get<Order[]>('/');
+  }
 }

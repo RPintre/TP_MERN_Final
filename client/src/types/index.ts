@@ -34,9 +34,16 @@ export interface OrderArticlePopulated {
   quantite: number;
 }
 
+export interface OrderUser {
+  _id: string;
+  prenom: string;
+  nom: string;
+  email: string;
+}
+
 export interface Order {
   _id?: string;
-  utilisateur: string;
+  utilisateur: string | OrderUser;
   articles: OrderArticlePopulated[];
   createdAt?: string;
   updatedAt?: string;

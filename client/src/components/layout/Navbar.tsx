@@ -29,6 +29,9 @@ export function Navbar() {
               <Link to="/catalogue" className="hover:text-blue-200 transition-colors text-sm font-medium">
                 Catalogue
               </Link>
+              <Link to="/commandes" className="hover:text-blue-200 transition-colors text-sm font-medium">
+                Commandes
+              </Link>
               <Link to="/panier" className="relative hover:text-blue-200 transition-colors text-sm font-medium">
                 Panier
                 {cartCount > 0 && (
