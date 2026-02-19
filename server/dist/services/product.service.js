@@ -3,9 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductService = void 0;
 const product_model_1 = require("../models/product.model");
 const api_error_1 = require("../utils/api-error");
+const regex_1 = require("../utils/regex");
 class ProductService {
-    async getAll(categorie) {
-        const query = categorie ? { categorie: new RegExp(`^${categorie}$`, "i") } : {};
+    async getAll(categorie, q) {
+        const query = {};
+        if (categorie) {
+            query.categorie = new RegExp(`^${(0, regex_1.escapeRegex)(categorie)}$`, "i");
+        }
+        if (q && q.trim()) {
+            const texte = new RegExp((0, regex_1.escapeRegex)(q.trim()), "i");
+            query.$or = [{ nom: texte }, { description: texte }, { categorie: texte }];
+        }
         return product_model_1.ProductModel.find(query).sort({ createdAt: -1 });
     }
     async getById(id) {

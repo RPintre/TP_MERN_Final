@@ -1,5 +1,6 @@
 import { ProductModel } from "../models/product.model";
 import { ApiError } from "../utils/api-error";
+import { escapeRegex } from "../utils/regex";
 
 interface CreateProductInput {
   nom: string;
@@ -16,8 +17,18 @@ interface UpdateProductInput {
 }
 
 export class ProductService {
-  public async getAll(categorie?: string) {
-    const query = categorie ? { categorie: new RegExp(`^${categorie}$`, "i") } : {};
+  public async getAll(categorie?: string, q?: string) {
+    const query: Record<string, unknown> = {};
+
+    if (categorie) {
+      query.categorie = new RegExp(`^${escapeRegex(categorie)}$`, "i");
+    }
+
+    if (q && q.trim()) {
+      const texte = new RegExp(escapeRegex(q.trim()), "i");
+      query.$or = [{ nom: texte }, { description: texte }, { categorie: texte }];
+    }
+
     return ProductModel.find(query).sort({ createdAt: -1 });
   }
 

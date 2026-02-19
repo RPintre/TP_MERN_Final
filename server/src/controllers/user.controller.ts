@@ -9,8 +9,9 @@ export class UserController {
     this.userService = new UserService();
   }
 
-  public getAll = async (_req: Request, res: Response): Promise<void> => {
-    const users = await this.userService.getAll();
+  public getAll = async (req: Request, res: Response): Promise<void> => {
+    const q = typeof req.query.q === "string" ? req.query.q : undefined;
+    const users = await this.userService.getAll(q);
     res.status(200).json(users);
   };
 

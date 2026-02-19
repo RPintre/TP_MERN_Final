@@ -7,7 +7,8 @@ class ProductController {
     constructor() {
         this.getAll = async (req, res) => {
             const categorie = typeof req.query.categorie === "string" ? req.query.categorie : undefined;
-            const products = await this.productService.getAll(categorie);
+            const q = typeof req.query.q === "string" ? req.query.q : undefined;
+            const products = await this.productService.getAll(categorie, q);
             res.status(200).json(products);
         };
         this.getById = async (req, res) => {

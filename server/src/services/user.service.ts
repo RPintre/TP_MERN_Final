@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { Role } from "../enums/role.enum";
 import { UserModel } from "../models/user.model";
 import { ApiError } from "../utils/api-error";
+import { escapeRegex } from "../utils/regex";
 
 interface CreateUserInput {
   prenom: string;
@@ -20,8 +21,15 @@ interface UpdateUserInput {
 }
 
 export class UserService {
-  public async getAll() {
-    return UserModel.find().select("-motDePasse").sort({ createdAt: -1 });
+  public async getAll(q?: string) {
+    const query: Record<string, unknown> = {};
+
+    if (q && q.trim()) {
+      const texte = new RegExp(escapeRegex(q.trim()), "i");
+      query.$or = [{ prenom: texte }, { nom: texte }, { email: texte }];
+    }
+
+    return UserModel.find(query).select("-motDePasse").sort({ createdAt: -1 });
   }
 
   public async getById(id: string) {

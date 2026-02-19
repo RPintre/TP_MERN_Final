@@ -8,9 +8,15 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const role_enum_1 = require("../enums/role.enum");
 const user_model_1 = require("../models/user.model");
 const api_error_1 = require("../utils/api-error");
+const regex_1 = require("../utils/regex");
 class UserService {
-    async getAll() {
-        return user_model_1.UserModel.find().select("-motDePasse").sort({ createdAt: -1 });
+    async getAll(q) {
+        const query = {};
+        if (q && q.trim()) {
+            const texte = new RegExp((0, regex_1.escapeRegex)(q.trim()), "i");
+            query.$or = [{ prenom: texte }, { nom: texte }, { email: texte }];
+        }
+        return user_model_1.UserModel.find(query).select("-motDePasse").sort({ createdAt: -1 });
     }
     async getById(id) {
         const user = await user_model_1.UserModel.findById(id).select("-motDePasse");

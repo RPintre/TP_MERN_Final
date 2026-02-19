@@ -11,7 +11,8 @@ export class ProductController {
 
   public getAll = async (req: Request, res: Response): Promise<void> => {
     const categorie = typeof req.query.categorie === "string" ? req.query.categorie : undefined;
-    const products = await this.productService.getAll(categorie);
+    const q = typeof req.query.q === "string" ? req.query.q : undefined;
+    const products = await this.productService.getAll(categorie, q);
     res.status(200).json(products);
   };
 

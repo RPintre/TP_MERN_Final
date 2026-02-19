@@ -5,8 +5,9 @@ const user_service_1 = require("../services/user.service");
 const api_error_1 = require("../utils/api-error");
 class UserController {
     constructor() {
-        this.getAll = async (_req, res) => {
-            const users = await this.userService.getAll();
+        this.getAll = async (req, res) => {
+            const q = typeof req.query.q === "string" ? req.query.q : undefined;
+            const users = await this.userService.getAll(q);
             res.status(200).json(users);
         };
         this.getById = async (req, res) => {
