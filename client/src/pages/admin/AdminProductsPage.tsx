@@ -33,6 +33,7 @@ const buildProductFields = (product?: Product) => [
 
 export function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -40,14 +41,14 @@ export function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const { fields, handleChange, handleBlur, validate, getValues, reset } = useForm(
+  const { fields, handleChange, handleBlur, validate, getValues, reset, resetWithFields } = useForm(
     buildProductFields(editingProduct ?? undefined)
   );
 
-  const loadProducts = () => {
+  const loadProducts = (q?: string) => {
     setLoading(true);
     productService
-      .getAll()
+      .getAll(undefined, q)
       .then(setProducts)
       .catch(() => setError('Impossible de charger les produits.'))
       .finally(() => setLoading(false));
@@ -57,6 +58,13 @@ export function AdminProductsPage() {
     loadProducts();
   }, []);
 
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    if (value.length === 0 || value.length >= 3) {
+      loadProducts(value);
+    }
+  };
+
   const openCreate = () => {
     setEditingProduct(null);
     reset();
@@ -65,6 +73,7 @@ export function AdminProductsPage() {
 
   const openEdit = (product: Product) => {
     setEditingProduct(product);
+    resetWithFields(buildProductFields(product));
     setShowForm(true);
   };
 
@@ -115,6 +124,16 @@ export function AdminProductsPage() {
           <p className="text-gray-500 text-sm mt-1">{products.length} produit(s) au catalogue</p>
         </div>
         <Button onClick={openCreate}>+ Nouveau produit</Button>
+      </div>
+
+      <div className="mb-6">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Rechercher un produit... (3 caractères min)"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
       </div>
 
       {error && <div className="mb-4"><Alert message={error} type="error" /></div>}

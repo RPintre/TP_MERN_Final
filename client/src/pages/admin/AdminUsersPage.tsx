@@ -50,6 +50,7 @@ const buildUserFields = (user?: User) => {
 
 export function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -57,14 +58,14 @@ export function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const { fields, handleChange, handleBlur, validate, getValues, reset } = useForm(
+  const { fields, handleChange, handleBlur, validate, getValues, reset, resetWithFields } = useForm(
     buildUserFields(editingUser ?? undefined)
   );
 
-  const loadUsers = () => {
+  const loadUsers = (q?: string) => {
     setLoading(true);
     userService
-      .getAll()
+      .getAll(q)
       .then(setUsers)
       .catch(() => setError('Impossible de charger les adhérents.'))
       .finally(() => setLoading(false));
@@ -74,6 +75,13 @@ export function AdminUsersPage() {
     loadUsers();
   }, []);
 
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    if (value.length === 0 || value.length >= 3) {
+      loadUsers(value);
+    }
+  };
+
   const openCreate = () => {
     setEditingUser(null);
     reset();
@@ -82,6 +90,7 @@ export function AdminUsersPage() {
 
   const openEdit = (user: User) => {
     setEditingUser(user);
+    resetWithFields(buildUserFields(user));
     setShowForm(true);
   };
 
@@ -142,6 +151,16 @@ export function AdminUsersPage() {
         <Button onClick={openCreate}>+ Nouvel adhérent</Button>
       </div>
 
+      <div className="mb-6">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Rechercher un adhérent... (3 caractères min)"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+
       {error && <div className="mb-4"><Alert message={error} type="error" /></div>}
       {success && <div className="mb-4"><Alert message={success} type="success" /></div>}
 
@@ -194,8 +213,8 @@ export function AdminUsersPage() {
                   <td className="px-4 py-3">
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin'
-                          ? 'bg-purple-50 text-purple-700'
-                          : 'bg-green-50 text-green-700'
+                        ? 'bg-purple-50 text-purple-700'
+                        : 'bg-green-50 text-green-700'
                         }`}
                     >
                       {user.role === 'admin' ? 'Admin' : 'Adhérent'}

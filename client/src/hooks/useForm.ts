@@ -33,9 +33,14 @@ export function useForm(initialFields: FormField[]) {
     setFields(validator.cloneFields());
   }, [validator]);
 
+  const resetWithFields = useCallback((newFields: FormField[]) => {
+    validator.reinitialize(newFields);
+    setFields(validator.cloneFields());
+  }, [validator]);
+
   const getValues = useCallback((): Record<string, string> => {
     return validator.getValues();
   }, [validator]);
 
-  return { fields, handleChange, handleBlur, validate, reset, getValues };
+  return { fields, handleChange, handleBlur, validate, reset, resetWithFields, getValues };
 }

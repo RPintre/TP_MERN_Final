@@ -15,8 +15,11 @@ export class ProductService extends ApiService {
     return ProductService.instance;
   }
 
-  async getAll(categorie?: SportCategory): Promise<Product[]> {
-    const params = categorie ? { params: { categorie } } : undefined;
+  async getAll(categorie?: SportCategory, q?: string): Promise<Product[]> {
+    const query: Record<string, string> = {};
+    if (categorie) query.categorie = categorie;
+    if (q) query.q = q;
+    const params = Object.keys(query).length ? { params: query } : undefined;
     return this.get<Product[]>('/', params);
   }
 

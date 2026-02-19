@@ -11,33 +11,39 @@ const productService = ProductService.getInstance();
 const cartService = CartService.getInstance();
 
 export function CataloguePage() {
-  const [products, setProducts] = useState<Product[]>([]);
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<SportCategory | 'Tous'>('Tous');
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addedId, setAddedId] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadProducts = (cat?: SportCategory | 'Tous', q?: string) => {
+    setLoading(true);
+    const categorie = cat && cat !== 'Tous' ? cat : undefined;
+    const query = q && q.length >= 3 ? q : undefined;
     productService
-      .getAll()
+      .getAll(categorie, query)
       .then((data) => {
-        setProducts(data);
         setFiltered(data);
       })
       .catch(() => setError('Impossible de charger le catalogue.'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadProducts();
   }, []);
 
   const filterByCategory = (cat: SportCategory | 'Tous') => {
     setActiveCategory(cat);
-    if (cat === 'Tous') {
-      setFiltered(products);
-    } else {
-      productService
-        .getAll(cat)
-        .then(setFiltered)
-        .catch(() => setFiltered(products.filter((p) => p.categorie === cat)));
+    loadProducts(cat, search);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    if (value.length === 0 || value.length >= 3) {
+      loadProducts(activeCategory, value);
     }
   };
 
@@ -49,9 +55,19 @@ export function CataloguePage() {
 
   return (
     <Layout>
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-1">Catalogue de matériel</h1>
         <p className="text-gray-500">Réservez votre équipement sportif en quelques clics</p>
+      </div>
+
+      <div className="mb-6">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Rechercher un produit... (3 caractères min)"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
       </div>
 
       {error && <Alert message={error} type="error" />}
@@ -62,8 +78,8 @@ export function CataloguePage() {
             key={cat}
             onClick={() => filterByCategory(cat)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors cursor-pointer ${activeCategory === cat
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
               }`}
           >
             {cat}

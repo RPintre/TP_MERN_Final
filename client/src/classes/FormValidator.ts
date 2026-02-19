@@ -53,6 +53,10 @@ export class FormValidator {
     this.fields.forEach((field) => field.reset());
   }
 
+  reinitialize(fields: FormField[]): void {
+    this.fields = new Map(fields.map((f) => [f.name, f]));
+  }
+
   cloneFields(): FormField[] {
     return Array.from(this.fields.values()).map((f) => f.clone());
   }

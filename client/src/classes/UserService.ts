@@ -31,8 +31,9 @@ export class UserService extends ApiService {
     return UserService.instance;
   }
 
-  async getAll(): Promise<User[]> {
-    return this.get<User[]>('/');
+  async getAll(q?: string): Promise<User[]> {
+    const params = q ? { params: { q } } : undefined;
+    return this.get<User[]>('/', params);
   }
 
   async getById(id: string): Promise<User> {
